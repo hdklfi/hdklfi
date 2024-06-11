@@ -1,0 +1,122 @@
+  var supportsPassive = false;
+  if (inBrowser) {
+    try {
+      var opts = {};
+      Object.defineProperty(opts, 'passive', ({
+        get: function get () {
+          /* istanbul ignore next */
+          supportsPassive = true;
+        }
+      })); // https://github.com/facebook/flow/issues/285
+      window.addEventListener('test-passive', null, opts);
+    } catch (e) {}
+  }
+
+  // this needs to be lazy-evaled because vue may be required before
+  // vue-server-renderer can set VUE_ENV
+  var _isServer;
+  var isServerRendering = function () {
+    if (_isServer === undefined) {
+      /* istanbul ignore if */
+      if (!inBrowser && !inWeex && typeof global !== 'undefined') {
+        // detect presence of vue-server-renderer and avoid
+        // Webpack shimming the process
+        _isServer = global['process'] && global['process'].env.VUE_ENV === 'server';
+      } else {
+        _isServer = false;
+      }
+    }
+    return _isServer
+  };
+
+  // detect devtools
+  var devtools = inBrowser && window.__VUE_DEVTOOLS_GLOBAL_HOOK__;
+
+  /* istanbul ignore next */
+  function isNative (Ctor) {
+    return typeof Ctor === 'function' && /native code/.test(Ctor.toString())
+  }
+
+  var hasSymbol =
+    typeof Symbol !== 'undefined' && isNative(Symbol) &&
+    typeof Reflect !== 'undefined' && isNative(Reflect.ownKeys);
+
+  var _Set;
+  /* istanbul ignore if */ // $flow-disable-line
+  if (typeof Set !== 'undefined' && isNative(Set)) {
+    // use native Set when available.
+    _Set = Set;
+  } else {
+    // a non-standard Set polyfill that only works with primitive keys.
+    _Set = /*@__PURE__*/(function () {
+      function Set () {
+        this.set = Object.create(null);
+      }
+      Set.prototype.has = function has (key) {
+        return this.set[key] === true
+      };
+      Set.prototype.add = function add (key) {
+        this.set[key] = true;
+      };
+      Set.prototype.clear = function clear () {
+        this.set = Object.create(null);
+      };
+
+      return Set;
+    }());
+  }
+
+  /*  */
+
+  var warn = noop;
+  var tip = noop;
+  var generateComponentTrace = (noop); // work around flow check
+  var formatComponentName = (noop);
+
+  {
+    var hasConsole = typeof console !== 'undefined';
+    var classifyRE = /(?:^|[-_])(\w)/g;
+    var classify = function (str) { return str
+      .replace(classifyRE, function (c) { return c.toUpperCase(); })
+      .replace(/[-_]/g, ''); };
+
+    warn = function (msg, vm) {
+      var trace = vm ? generateComponentTrace(vm) : '';
+
+      if (config.warnHandler) {
+        config.warnHandler.call(null, msg, vm, trace);
+      } else if (hasConsole && (!config.silent)) {
+        console.error(("[Vue warn]: " + msg + trace));
+      }
+    };
+
+    tip = function (msg, vm) {
+      if (hasConsole && (!config.silent)) {
+        console.warn("[Vue tip]: " + msg + (
+          vm ? generateComponentTrace(vm) : ''
+        ));
+      }
+    };
+
+    formatComponentName = function (vm, includeFile) {
+      if (vm.$root === vm) {
+        return '<Root>'
+      }
+      var options = typeof vm === 'function' && vm.cid != null
+        ? vm.options
+        : vm._isVue
+          ? vm.$options || vm.constructor.options
+          : vm;
+      var name = options.name || options._componentTag;
+      var file = options.__file;
+      if (!name && file) {
+        var match = file.match(/([^/\\]+)\.vue$/);
+        name = match && match[1];
+      }
+
+      return (
+        (name ? ("<" + (classify(name)) + ">") : "<Anonymous>") +
+        (file && includeFile !== false ? (" at " + file) : '')
+      )
+    };
+
