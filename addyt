@@ -1,0 +1,18 @@
+-- 删除tb_brand表
+drop table if exists tb_user;
+-- 创建tb_brand表
+create table tb_user
+(
+    -- id 主键
+    id           int primary key auto_increment,
+    -- 用户名称
+    username   varchar(20),
+    -- 用户密码
+    password varchar(20)
+);
+-- 添加数据
+insert into tb_user (username, password)
+values 
+       ('ming', '1234567890'),
+       ('wang', '1234567890')
+			 ;
