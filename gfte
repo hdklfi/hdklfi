@@ -1,0 +1,160 @@
+import os  
+from pygame.sprite import Sprite  
+from pygame.image import load  
+  
+from dissipate.img import img_basic, img_energy, img_board, img_text, img_level, img_button, img_animal, img_ice, \  
+    img_boom  
+  
+  
+# 基类,GameSprite类定义了所有游戏精灵的基类，包括加载图像、设置位置和绘制方法。  
+class GameSprite(Sprite):  
+    def __init__(self, icon, position):  
+        # 初始化GameSprite类，继承自pygame的Sprite类。  
+        super().__init__()  
+        # 加载图像并转换为具有透明通道的格式。  
+        self.image = load(icon).convert_alpha()  
+        # 获取图像的矩形区域。  
+        self.rect = self.image.get_rect()  
+        # 设置精灵的位置。  
+        self.rect.topleft = position  
+        self.rect.bottomleft = position  
+  
+    def draw(self, screen):  
+        # 将精灵绘制到屏幕上。  
+        screen.blit(self.image, self.rect)  
+  
+  
+class Tree(GameSprite):  
+    """  
+    关卡树类，显示关卡树和相关资源。  
+    """    # 树、果实、能量数字、金钱和购买能量按钮的图像路径。  
+    tree = os.path.join(img_basic, 'tree.png')  
+    fruit = os.path.join(img_basic, 'fruit.png')  
+    energy_num = os.path.join(img_energy, 'num.png')  
+    money = os.path.join(img_basic, 'money.png')  
+    energy_buy = os.path.join(img_energy, 'buy.png')  
+  
+    # 树、果实、能量数字、购买能量按钮的位置定义。  
+    x, y = 340, 510  
+    h = 90  
+    position = (  
+        [x, y],  
+        [x + 50, y - 25],  
+        [x + 105, y - 45],  
+        [x - 5, y - h - 5],  
+        [x + 55, y - 25 - h + 10],  
+        [x + 105, y - 45 - h],  
+        [x, y - h * 2],  
+        [x + 50 + 10, y - 25 - h * 2 - 5],  
+        [x + 105 + 25, y - 45 - h * 2 - 14],  
+        [x + 30, y - h * 3 - 30]  
+    )  # 果实位置  
+    energy_num_position = (15, 70)  # 能量位置  
+    energy_buy_position = (250, 400)  # 购买能量位置  
+  
+    def __init__(self, icon, position):  
+        """  
+        初始化树对象  
+        """        # 重写GameSprite的构造函数，用于初始化树对象。  
+        super().__init__(icon, position)  
+        self.image = load(icon).convert_alpha()  
+        self.rect = self.image.get_rect()  
+        self.rect.bottomleft = position  
+  
+  
+class Board(GameSprite):  
+    """  
+    游戏面板类，显示游戏面板和相关资源。  
+    Board类继承自GameSprite类，用于创建和显示游戏板的精灵，并包含移动逻辑。  
+    """    # 游戏板、数字格式、任务板、成功、失败、下一步、重玩、星星、金钱的图像路径。  
+    step_board = os.path.join(img_board, 'step.png')  
+    num_format = os.path.join(img_text, '%d.png')  
+    task_board = os.path.join(img_basic, 'task.png')  
+    ok = os.path.join(img_basic, 'ok.png')  
+    level_format = os.path.join(img_level, '%d.png')  
+    success = os.path.join(img_board, 'success.png')  
+    fail = os.path.join(img_board, 'fail.png')  
+    step_add = os.path.join(img_button, 'step_add.png')  
+    next = os.path.join(img_button, 'next.png')  
+    replay = os.path.join(img_button, 'replay.png')  
+    stars = os.path.join(img_basic, 'star.png')  
+    money = os.path.join(img_basic, 'money.png')  
+  
+    # 按钮和星星的位置定义。  
+    button_position = [[300, 465], [500, 465]]  
+    starts_position = [[330, 340], [413, 340], [495, 340]]  
+  
+    def __init__(self, icon, position):  
+        """  
+        初始化板对象  
+        """        super().__init__(icon, position)  
+        # 重写GameSprite的构造函数，用于初始化板对象。  
+        self.image = load(icon).convert_alpha()  
+        self.speed = [0, 44]  # 初始速度  
+        self.rect = self.image.get_rect()  
+        self.rect.bottomleft = position  
+  
+    def move(self):  
+        """  
+        根据速度移动面板  
+        """        self.rect = self.rect.move(self.speed)  
+        if self.rect.bottom >= 543:  # 到达底部边界  
+            self.speed = [0, -45]  
+        if self.speed == [0, -45] and self.rect.bottom <= 450:  # 到达顶部边界  
+            self.speed = [0, 0]  
+  
+  
+class Element(GameSprite):  
+    """  
+    Element类继承自GameSprite类，用于创建和显示游戏中元素的精灵，并包含移动逻辑。  
+    """    # 动物、冰、砖块、框架、爆炸数字、冰的数字格式、分数等级、无动物、退出的图像路径。  
+    animals = (  
+        os.path.join(img_animal, 'fox.png'),  
+        os.path.join(img_animal, 'bear.png'),  
+        os.path.join(img_animal, 'chick.png'),  
+        os.path.join(img_animal, 'eagle.png'),  
+        os.path.join(img_animal, 'frog.png'),  
+        os.path.join(img_animal, 'cow.png')  
+    )  
+    ice = os.path.join(img_ice, 'normal.png')  
+    brick = os.path.join(img_basic, 'brick.png')  
+    frame = os.path.join(img_basic, 'frame.png')  
+    boom_format = os.path.join(img_boom, '%d.png')  
+    ice_format = os.path.join(img_ice, '%d.png')  
+  
+    # 分数图片  
+    score_level = (  
+        os.path.join(img_text, 'good.png'),  
+        os.path.join(img_text, 'great.png'),  
+        os.path.join(img_text, 'amazing.png'),  
+        os.path.join(img_basic, 'excellent.png'),  
+        os.path.join(img_basic, 'unbelievable.png')  
+    )  
+    none_animal = os.path.join(img_basic, 'none_animal.png')  
+    stop = os.path.join(img_basic, 'exit.png')  
+    stop_position = (20, 530)  
+  
+    def __init__(self, icon, position):  
+        """  
+        初始化元素对象  
+        """        # 重写GameSprite的构造函数，用于初始化元素对象。  
+        super().__init__(icon, position)  
+        self.image = load(icon).convert_alpha()  
+        self.rect = self.image.get_rect()  
+        self.rect.topleft = position  
+        self.speed = [0, 0]  # 初始速度  
+        self.init_position = position  # 初始位置  
+  
+    def move(self, speed):  
+        """  
+        以给定速度移动元素  
+        """        self.speed = speed  
+        self.rect = self.rect.move(self.speed)  
+        if self.speed[0] != 0:  # 水平移动  
+            if abs(self.rect.left - self.init_position[0]) == self.rect.width:  
+                self.init_position = self.rect.topleft  
+                self.speed = [0, 0]  
+        else:  # 垂直移动  
+            if abs(self.rect.top - self.init_position[1]) == self.rect.height:  
+                self.init_position = self.rect.topleft  
+                self.speed = [0, 0]
