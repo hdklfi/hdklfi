@@ -1,0 +1,22 @@
+# 图像去噪灰度处理
+gray_image = gray_guss(image)
+ret, image = cv2.threshold(gray_image, 0, 255, cv2.THRESH_OTSU)
+plt_show(image)
+#膨胀操作
+kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (4, 4))
+image = cv2.dilate(image, kernel)
+plt_show(image)
+words = sorted(words,key=lambda s:s[0],reverse=False)
+i = 0
+#word中存放轮廓的起始点和宽高
+for word in words:
+    # 筛选字符的轮廓
+    if (word[3] > (word[2] * 1.5)) and (word[3] < (word[2] * 5.5)) and (word[2] > 10):
+        i = i+1
+        if word[2] < 15:
+            splite_image = image[word[1]:word[1] + word[3], word[0]-word[2]:word[0] + word[2]*2]
+        else:
+            splite_image = image[word[1]:word[1] + word[3], word[0]:word[0] + word[2]]
+        word_images.append(splite_image)
+        print(i)
+print(words)
