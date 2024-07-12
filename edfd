@@ -1,0 +1,24 @@
+class ConcreteProductA implements Product {
+    public void use() {
+        System.out.println("Using ConcreteProductA");
+    }
+}
+
+class ConcreteProductB implements Product {
+    public void use() {
+        System.out.println("Using ConcreteProductB");
+    }
+}
+class ConcreteCreatorA extends Creator {
+    @Override
+    Product factoryMethod() {
+        return new ConcreteProductA();
+    }
+}
+
+class ConcreteCreatorB extends Creator {
+    @Override
+    Product factoryMethod() {
+        return new ConcreteProductB();
+    }
+}
