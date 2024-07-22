@@ -1,0 +1,241 @@
+void Input_course(vector<Course>& cour)
+{
+    system("cls");
+    cour.clear();
+    int i = 0;
+    char sign = '0';
+    Course temp;
+
+    cout << "=============== Please input the massage ===============" << endl;
+    while (sign != 'n' && sign != 'N')
+    {
+    loop:
+        cout << "ID: ";
+        cin >> temp.id;
+
+        int c = 0;
+        while (c < i)
+        {
+            c++;
+            if (!strcmp(temp.id, cour[i - c].id))
+            {
+                cout << "ID repeat, please input again." << endl;
+                goto loop;
+            }
+        }
+
+        cout << "name of course: ";
+        cin >> temp.name;
+        cout << "elective or compilsory(0 or 1): ";
+        cin >> temp.nature;
+        cout << "class hour: ";
+        cin >> temp.hour;
+        cout << "credir: ";
+        cin >> temp.credir;
+        temp.count = 0;                 // the default is 0
+
+        cour.push_back(temp);           // push_back
+
+        cout << "whether continue(y or n): ";
+        cin >> sign;
+        i++;
+    }
+
+    Write_course(cour, i);                  // save
+}
+
+void Delete_course(vector<Course>& cour)
+{
+    system("cls");
+    int n = Read_course(cour);
+    int i = 0;
+    char id[20];
+    cout << "=============== Delete the message of course ===============" << endl;
+    cout << "please input the ID of course which you want to delete: ";
+    cin >> id;
+    while (i < n && strcmp(id, cour[i].id))
+        i++;
+
+    if (i == n)
+    {
+        cout << "no fount." << endl;
+        system("pause");
+        return;
+    }
+    else
+    {
+        if (cour[i].count)
+        {
+            cout << "所选人数不为零，请联系所有学生退课后，再修改课程信息。" << endl;
+            system("pause");
+            return;
+        }
+    }
+
+    for (int j = i; j < n - 1; j++)
+        swap(cour[j], cour[j + 1]);
+
+    // save
+    char sign;
+    cout << "whether delete(y or n): ";
+    cin >> sign;
+    if (sign != 'n' && sign != 'N')
+    {
+        cour.erase(cour.end() - 1);
+        Write_course(cour, n - 1);
+        cout << "=============== Delete succeed ===============" << endl;
+    }
+}
+
+void Modify_course(vector<Course>& cour)
+{
+    system("cls");
+    int n = Read_course(cour);                      // count of course
+    char id[20];
+    int i = 0;
+
+    cout << "=============== Modify course ===============" << endl;
+    cout << "input the ID of course you want to modify: ";
+    cin >> id;
+    while ( i < n && strcmp(id, cour[i].id))        // i < n 要提前判断
+        i++;
+
+    if (i == n)
+    {
+        cout << "no found." << endl;
+        system("pause");
+        return;
+    }
+    else
+    {
+        if (cour[i].count)
+        {
+            cout << "所选人数不为零，请联系所有学生退课后，再修改课程信息。" << endl;
+            system("pause");
+            return;
+        }
+    }
+
+    cout << "----------------------------------------------------" << endl;
+    cout << "ID" << "\t" << "name" << "\t" << "nature" << "\t"
+        << "hour" << "\t" << "credir" << "\t" << "count" << endl;
+    cout << "----------------------------------------------------" << endl;
+    cout << cour[i].id << "\t" << cour[i].name << "\t" << cour[i].nature << "\t"
+        << cour[i].hour << "\t" << cour[i].credir << "\t" << cour[i].count << endl;
+
+    cout << "please reenter the message of course." << endl;
+    cout << "name of course: ";
+    cin >> cour[i].name;
+    cout << "elective or compilsory(0 or 1): ";
+    cin >> cour[i].nature;
+    cout << "class hour: ";
+    cin >> cour[i].hour;
+    cout << "credir: ";
+    cin >> cour[i].credir;
+
+    // save
+    char sign;
+    cout << "whether save the data(y or n): ";
+    cin >> sign;
+    if (sign != 'n' && sign != 'N')
+    {
+        Write_course(cour, n);
+        cout << "=============== Modify succeed ===============" << endl;
+        system("pause");
+    }
+}
+
+void Lookup_course(vector<Course>& cour)
+{
+    system("cls");
+    int n = Read_course(cour);
+    int i = 0;
+    char id[20];
+
+    cout << "=============== Lookup the course ===============" << endl;
+    cout << "please input the course ID you want to seek: ";
+    cin >> id;
+
+    while (i < n && strcmp(id, cour[i].id))
+        i++;
+
+    if (i == n)
+    {
+        cout << "no found." << endl;
+    }
+    else
+    {
+        cout << "---------------------------------------------" << endl;
+        cout << "ID: " << cour[i].id << endl;
+        cout << "name: " << cour[i].name << endl;
+        cout << "nature: " << (cour[i].nature ? "compulsory" : "elective") << endl;
+        cout << "class hour: " << cour[i].hour << endl;
+        cout << "credir: " << cour[i].credir << endl;
+        cout << "student count: " << cour[i].count << endl;
+    }
+    system("pause");
+}
+
+void Show_course(vector<Course>& cour)
+{
+    system("cls");
+    int n = Read_course(cour);
+
+    cout << "================ display all course ================" << endl;
+    cout << "----------------------------------------------------" << endl;
+    cout << "ID" << "\t" << "name" << "\t" << "nature" << "\t"
+        << "hour" << "\t" << "credir" << "\t" << "count" << endl;
+
+    cout << "----------------------------------------------------" << endl;
+    for (int i = 0; i < n; i++)
+    {
+        cout << cour[i].id << "\t" << cour[i].name << "\t" << cour[i].nature << "\t" << cour[i].hour << "\t" << cour[i].credir << "\t" << cour[i].count << endl;
+    }
+    system("pause");
+}
+
+void Add_course(vector<Course>& cour)
+{
+    system("cls");
+    int n = Read_course(cour);
+    char sign = '0';
+    Course temp;
+
+    cout << "=============== add course ===============" << endl;
+    while (sign != 'n' && sign != 'N')
+    {
+    loop:
+        cout << "ID: ";
+        cin >> temp.id;
+        int c = 0;
+        while (c < n)
+        {
+            c++;
+            if (!strcmp(temp.id, cour[n - c].id))
+            {
+                cout << "ID repeat, please input again." << endl;
+                goto loop;
+            }
+        }
+
+        cout << "name of course: ";
+        cin >> temp.name;
+        cout << "elective or compulsory(0 or 1): ";
+        cin >> temp.nature;
+        cout << "class hour: ";
+        cin >> temp.hour;
+        cout << "credir: ";
+        cin >> temp.credir;
+        temp.count = 0;
+
+        n++;
+
+        cour.push_back(temp);
+
+        cout << "whether continue(y or n): ";
+        cin >> sign;
+    }
+
+    // save
+    Write_course(cour, n);
+}
