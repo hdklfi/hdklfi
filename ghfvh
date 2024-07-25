@@ -1,0 +1,72 @@
+def predict_from_file_to_file(audio_file,
+                              output_pitch_file,
+                              output_harmonicity_file=None,
+                              output_periodicity_file=None,
+                              hop_length=None,
+                              fmin=50.,
+                              fmax=MAX_FMAX,
+                              model='full',
+                              decoder=crepe.decode.viterbi,
+                              batch_size=None,
+                              device='cpu',
+                              pad=True):
+    """Performs pitch estimation from file on disk
+
+    Arguments
+        audio_file (string)
+            The file to perform pitch tracking on
+        output_pitch_file (string)
+            The file to save predicted pitch
+        output_harmonicity_file (string or None) [DEPRECATED]
+            The file to save predicted harmonicity
+        output_periodicity_file (string or None)
+            The file to save predicted periodicity
+        hop_length (int)
+            The hop_length in samples
+        fmin (float)
+            The minimum allowable frequency in Hz
+        fmax (float)
+            The maximum allowable frequency in Hz
+        model (string)
+            The model capacity. One of 'full' or 'tiny'.
+        decoder (function)
+            The decoder to use. See decode.py for decoders.
+        batch_size (int)
+            The number of frames per batch
+        device (string)
+            The device used to run inference
+        pad (bool)
+            Whether to zero-pad the audio
+    """
+    # Deprecate output_harmonicity_file
+    if output_harmonicity_file is not None:
+        message = (
+            'The crepe output_harmonicity_file argument is deprecated and '
+            'will be removed in a future release. Please use '
+            'output_periodicity_file. Rationale: if network confidence measured '
+            'harmonic content, the value would be low for non-harmonic, periodic '
+            'sounds (e.g., sine waves). But this is not observed.')
+        warnings.warn(message, DeprecationWarning)
+        output_periodicity_file = output_harmonicity_file
+
+    # Predict from file
+    prediction = predict_from_file(audio_file,
+                                   hop_length,
+                                   fmin,
+                                   fmax,
+                                   model,
+                                   decoder,
+                                   False,
+                                   output_periodicity_file is not None,
+                                   batch_size,
+                                   device,
+                                   pad)
+
+    # Save to disk
+    if output_periodicity_file is not None:
+        torch.save(prediction[0].detach(), output_pitch_file)
+        torch.save(prediction[1].detach(), output_periodicity_file)
+    else:
+        torch.save(prediction.detach(), output_pitch_file)
+
+
